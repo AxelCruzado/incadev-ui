@@ -2,14 +2,15 @@
 // src/pages/marketing/cursos/[id].astro
 import Layout from "../../../layouts/MarketingLayout.astro";
 
-export const prerender = false;
+export function getStaticPaths() {
+  return [{ params: { slug: "" } }];
+}
 
-const { id } = Astro.params;
 const mockTitle = "Curso - INCADEV UI";
 ---
 
 <Layout title={mockTitle}>
-  <div class="space-y-6" data-course-id={id}>
+  <div class="space-y-6">
     <!-- Breadcrumb -->
     <nav
       class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
@@ -105,8 +106,7 @@ const mockTitle = "Curso - INCADEV UI";
             </p>
 
             <!-- Info del curso -->
-            <div id="cursoInfo" class="flex flex-wrap gap-4 text-sm">
-            </div>
+            <div id="cursoInfo" class="flex flex-wrap gap-4 text-sm"></div>
           </div>
 
           <div class="flex gap-2">
@@ -209,7 +209,10 @@ const mockTitle = "Curso - INCADEV UI";
             Versiones del Curso
           </h2>
 
-          <div id="versionesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            id="versionesList"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
           </div>
 
           <div id="emptyVersiones" class="hidden text-center py-12">
@@ -339,7 +342,10 @@ const mockTitle = "Curso - INCADEV UI";
     // VARIABLES GLOBALES
     // ============================================
     const mainDiv = document.querySelector("[data-course-id]") as HTMLElement;
-    const courseId = parseInt(mainDiv?.dataset.courseId || "0", 10);
+    const courseId = parseInt(
+      window.location.pathname.split("/").pop() || "0",
+      10,
+    );
 
     let cursoData: CourseDetailForUI | null = null;
     let campaignsData: CourseCampaignsForUI | null = null;
@@ -373,7 +379,10 @@ const mockTitle = "Curso - INCADEV UI";
     }
 
     function getVersionEstadoBadge(estado: string) {
-      const configs: Record<string, { bg: string; text: string; label: string }> = {
+      const configs: Record<
+        string,
+        { bg: string; text: string; label: string }
+      > = {
         published: {
           bg: "bg-green-50 dark:bg-green-950/30",
           text: "text-green-700 dark:text-green-400",
@@ -544,7 +553,10 @@ const mockTitle = "Curso - INCADEV UI";
     // ACTUALIZAR MÉTRICAS
     // ============================================
 
-    function actualizarMetricas(data: CourseCampaignsForUI, curso: CourseDetailForUI) {
+    function actualizarMetricas(
+      data: CourseCampaignsForUI,
+      curso: CourseDetailForUI,
+    ) {
       // Calcular totales
       let totalReach = 0;
       let totalInteractions = 0;
@@ -558,7 +570,8 @@ const mockTitle = "Curso - INCADEV UI";
         sumCtr += c.metricas.averageCtr;
       });
 
-      const avgCtr = data.campañas.length > 0 ? sumCtr / data.campañas.length : 0;
+      const avgCtr =
+        data.campañas.length > 0 ? sumCtr / data.campañas.length : 0;
 
       // Quick Metrics
       const quickMetrics = document.getElementById("quickMetrics");
@@ -586,17 +599,30 @@ const mockTitle = "Curso - INCADEV UI";
       // Tab Métricas
       const metricaAlcance = document.getElementById("metricaAlcance");
       const metricaCTR = document.getElementById("metricaCTR");
-      const metricaInteracciones = document.getElementById("metricaInteracciones");
-      const metricaTotalCampanas = document.getElementById("metricaTotalCampanas");
+      const metricaInteracciones = document.getElementById(
+        "metricaInteracciones",
+      );
+      const metricaTotalCampanas = document.getElementById(
+        "metricaTotalCampanas",
+      );
       const metricaTotalPosts = document.getElementById("metricaTotalPosts");
-      const metricaTotalVersiones = document.getElementById("metricaTotalVersiones");
+      const metricaTotalVersiones = document.getElementById(
+        "metricaTotalVersiones",
+      );
 
-      if (metricaAlcance) metricaAlcance.textContent = totalReach > 1000 ? (totalReach / 1000).toFixed(1) + "K" : String(totalReach);
+      if (metricaAlcance)
+        metricaAlcance.textContent =
+          totalReach > 1000
+            ? (totalReach / 1000).toFixed(1) + "K"
+            : String(totalReach);
       if (metricaCTR) metricaCTR.textContent = avgCtr.toFixed(1) + "%";
-      if (metricaInteracciones) metricaInteracciones.textContent = String(totalInteractions);
-      if (metricaTotalCampanas) metricaTotalCampanas.textContent = String(data.totalCampañas);
+      if (metricaInteracciones)
+        metricaInteracciones.textContent = String(totalInteractions);
+      if (metricaTotalCampanas)
+        metricaTotalCampanas.textContent = String(data.totalCampañas);
       if (metricaTotalPosts) metricaTotalPosts.textContent = String(totalPosts);
-      if (metricaTotalVersiones) metricaTotalVersiones.textContent = String(curso.versiones.length);
+      if (metricaTotalVersiones)
+        metricaTotalVersiones.textContent = String(curso.versiones.length);
     }
 
     // ============================================
@@ -632,7 +658,7 @@ const mockTitle = "Curso - INCADEV UI";
       } catch (error) {
         console.error("[Curso Detail] Error loading data:", error);
         mostrarError(
-          error instanceof Error ? error.message : "Error desconocido"
+          error instanceof Error ? error.message : "Error desconocido",
         );
       }
 
@@ -649,7 +675,7 @@ const mockTitle = "Curso - INCADEV UI";
               "bg-blue-50",
               "dark:bg-blue-950/30",
               "text-blue-600",
-              "dark:text-blue-400"
+              "dark:text-blue-400",
             );
             b.classList.add("text-gray-600", "dark:text-gray-400");
           });
@@ -657,7 +683,7 @@ const mockTitle = "Curso - INCADEV UI";
             "bg-blue-50",
             "dark:bg-blue-950/30",
             "text-blue-600",
-            "dark:text-blue-400"
+            "dark:text-blue-400",
           );
           btn.classList.remove("text-gray-600", "dark:text-gray-400");
 

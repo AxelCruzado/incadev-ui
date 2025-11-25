@@ -1,25 +1,22 @@
 ---
 import Layout from "../../../layouts/MarketingLayout.astro";
 
-export const prerender = false;
-
-const { id } = Astro.params;
-
-if (!id) {
-    return Astro.redirect("/marketing/campañas");
+export function getStaticPaths() {
+    return [{ params: { slug: "" } }];
 }
 
 const mockTitle = "Detalle de Campaña";
 ---
 
 <Layout title={mockTitle}>
-    <div class="space-y-6" data-campaign-id={id}>
+    <div class="space-y-6">
         <!-- Back Button + Header -->
         <div class="flex items-center gap-4 mb-6">
             <a
                 href="/marketing/campañas"
                 class="p-2 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-lg smooth-transition"
-            >Back</a>
+                >Back</a
+            >
             <!-- Campaign level actions are rendered per-post below; avoid referencing `p` here which is only defined per-post in the list -->
         </div>
         <div class="flex-1">
@@ -381,7 +378,7 @@ const mockTitle = "Detalle de Campaña";
                     </select>
                 </div>
             </div>
-                        <!-- Link URL -->
+            <!-- Link URL -->
             <div>
                 <label
                     class="block text-sm font-semibold text-gray-900 dark:text-white mb-2"
@@ -398,15 +395,29 @@ const mockTitle = "Detalle de Campaña";
             </div>
             <!-- Generación con IA (prompt-first) -->
             <div class="pt-4 border-t border-gray-200 dark:border-gray-800">
-                <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Generar con IA (prompt)</label>
+                <label
+                    class="block text-sm font-semibold text-gray-900 dark:text-white mb-2"
+                    >Generar con IA (prompt)</label
+                >
                 <div class="flex gap-2">
-                    <input id="postPrompt" type="text" placeholder="Describe la publicación, p.ej. Oferta 2x1 en sandalias" class="flex-1 px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500" />
-                    <button id="btnGenerateAI" type="button" class="px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500">✨ Generar</button>
+                    <input
+                        id="postPrompt"
+                        type="text"
+                        placeholder="Describe la publicación, p.ej. Oferta 2x1 en sandalias"
+                        class="flex-1 px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                        id="btnGenerateAI"
+                        type="button"
+                        class="px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500"
+                        >✨ Generar</button
+                    >
                 </div>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">El generador creará texto sugerido e imagen temporal que podrás revisar antes de guardar.</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    El generador creará texto sugerido e imagen temporal que
+                    podrás revisar antes de guardar.
+                </p>
             </div>
-
-
 
             <!-- Contenido -->
             <div>
@@ -443,8 +454,6 @@ const mockTitle = "Detalle de Campaña";
                     Gemini AI
                 </p>
             </div>
-
-
 
             <!-- Estado y Fecha -->
             <div class="grid grid-cols-2 gap-4">
@@ -559,11 +568,14 @@ const mockTitle = "Detalle de Campaña";
         type UpdatePostDTO,
     } from "../../../services/marketing/index";
 
-                // ============================================
+    // ============================================
     // VARIABLES GLOBALES
     // ============================================
     const mainDiv = document.querySelector("[data-campaign-id]") as HTMLElement;
-    const campaignId = parseInt(mainDiv?.dataset.campaignId || "0", 10);
+    const campaignId = parseInt(
+        window.location.pathname.split("/").pop() || "0",
+        10,
+    );
 
     let campaignData: CampaignForUI | null = null;
     let posts: PostForUI[] = [];
@@ -843,8 +855,8 @@ const mockTitle = "Detalle de Campaña";
                                 Editar
                             </button>
                             ${
-                                    p.estado !== 'published'
-                                            ? `
+                                p.estado !== "published"
+                                    ? `
                             <button
                                 onclick="publicarPost(${p.id})"
                                 class="flex-1 px-3 py-2 text-center text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/30 rounded-lg smooth-transition text-sm font-medium"
@@ -852,7 +864,7 @@ const mockTitle = "Detalle de Campaña";
                                 🚀 Publicar
                             </button>
                             `
-                                            : ''
+                                    : ""
                             }
               <button
                 onclick="eliminarPost(${p.id})"
@@ -1078,7 +1090,9 @@ const mockTitle = "Detalle de Campaña";
         document.getElementById("modalPost")?.classList.add("flex");
 
         // Enable the header-level publish button when a post is selected for editing
-        const publishBtn = document.getElementById('btnPublishSelected') as HTMLButtonElement | null;
+        const publishBtn = document.getElementById(
+            "btnPublishSelected",
+        ) as HTMLButtonElement | null;
         if (publishBtn) publishBtn.disabled = false;
     };
 
@@ -1098,7 +1112,7 @@ const mockTitle = "Detalle de Campaña";
     };
 
     (window as any).publicarPost = async function (postId: number) {
-        if (!confirm('¿Deseas publicar esta publicación ahora?')) return;
+        if (!confirm("¿Deseas publicar esta publicación ahora?")) return;
 
         try {
             const updated = await publishPost(postId);
@@ -1106,15 +1120,17 @@ const mockTitle = "Detalle de Campaña";
             if (idx !== -1) posts[idx] = updated;
             // If the published post is the one currently selected for editing, disable the header publish button
             if (editingPostId === postId) {
-                const publishBtn = document.getElementById('btnPublishSelected') as HTMLButtonElement | null;
+                const publishBtn = document.getElementById(
+                    "btnPublishSelected",
+                ) as HTMLButtonElement | null;
                 if (publishBtn) publishBtn.disabled = true;
             }
             updateStats();
             renderPosts();
-            alert('✅ Publicación publicada correctamente');
+            alert("✅ Publicación publicada correctamente");
         } catch (error) {
-            console.error('Error publishing post:', error);
-            alert('❌ Error al publicar la publicación');
+            console.error("Error publishing post:", error);
+            alert("❌ Error al publicar la publicación");
         }
     };
 
@@ -1194,22 +1210,32 @@ const mockTitle = "Detalle de Campaña";
                 document.getElementById("modalPost")?.classList.add("flex");
 
                 // When creating a new post, no selection is active
-                const publishBtn = document.getElementById('btnPublishSelected') as HTMLButtonElement | null;
+                const publishBtn = document.getElementById(
+                    "btnPublishSelected",
+                ) as HTMLButtonElement | null;
                 if (publishBtn) publishBtn.disabled = true;
             });
 
         // Header-level publish button triggers publicarPost on the currently-selected editingPostId
-        const headerPublish = document.getElementById('btnPublishSelected');
-        headerPublish?.addEventListener('click', async () => {
-            if (!editingPostId) return alert('Selecciona una publicación para publicar (haz clic en Editar)');
+        const headerPublish = document.getElementById("btnPublishSelected");
+        headerPublish?.addEventListener("click", async () => {
+            if (!editingPostId)
+                return alert(
+                    "Selecciona una publicación para publicar (haz clic en Editar)",
+                );
 
             // Confirm and call existing publicarPost handler
-            if (!confirm('¿Deseas publicar la publicación seleccionada ahora?')) return;
+            if (!confirm("¿Deseas publicar la publicación seleccionada ahora?"))
+                return;
 
             try {
-                const updated = await (window as any).publicarPost(editingPostId);
+                const updated = await (window as any).publicarPost(
+                    editingPostId,
+                );
                 // publicarPost already updates posts/ui inside the function; ensure header button disabled afterwards
-                const btn = document.getElementById('btnPublishSelected') as HTMLButtonElement | null;
+                const btn = document.getElementById(
+                    "btnPublishSelected",
+                ) as HTMLButtonElement | null;
                 if (btn) btn.disabled = true;
             } catch (err) {
                 // publicarPost shows alerts on error; no-op here
@@ -1217,57 +1243,105 @@ const mockTitle = "Detalle de Campaña";
         });
 
         // Generar con IA (botón dentro del modal)
-        document.getElementById('btnGenerateAI')?.addEventListener('click', async () => {
-            const promptInput = document.getElementById('postPrompt') as HTMLInputElement;
-            const platformSelect = document.getElementById('postPlatform') as HTMLSelectElement;
-            const contentTypeSelect = document.getElementById('postContentType') as HTMLSelectElement;
-            if (!promptInput || !platformSelect) return;
+        document
+            .getElementById("btnGenerateAI")
+            ?.addEventListener("click", async () => {
+                const promptInput = document.getElementById(
+                    "postPrompt",
+                ) as HTMLInputElement;
+                const platformSelect = document.getElementById(
+                    "postPlatform",
+                ) as HTMLSelectElement;
+                const contentTypeSelect = document.getElementById(
+                    "postContentType",
+                ) as HTMLSelectElement;
+                if (!promptInput || !platformSelect) return;
 
-            const prompt = promptInput.value.trim();
-            const platform = platformSelect.value as 'facebook' | 'instagram';
-            const contentType = contentTypeSelect?.value as 'image' | 'video' | 'text' | undefined;
-            if (!contentType) return alert('Selecciona tipo de contenido antes de generar con IA');
+                const prompt = promptInput.value.trim();
+                const platform = platformSelect.value as
+                    | "facebook"
+                    | "instagram";
+                const contentType = contentTypeSelect?.value as
+                    | "image"
+                    | "video"
+                    | "text"
+                    | undefined;
+                if (!contentType)
+                    return alert(
+                        "Selecciona tipo de contenido antes de generar con IA",
+                    );
 
-            // Instagram does not accept text-only posts
-            if (platform === 'instagram' && contentType === 'text') {
-                return alert('Instagram requiere una imagen o video; no es posible generar solo texto para Instagram');
-            }
-            if (!prompt) return alert('Escribe un prompt para generar');
-
-            const btn = document.getElementById('btnGenerateAI') as HTMLButtonElement;
-            btn.disabled = true;
-            const original = btn.textContent;
-            btn.textContent = 'Generando...';
-
-            try {
-                const linkInput = document.getElementById('postLinkUrl') as HTMLInputElement;
-                const linkUrl = linkInput?.value || undefined;
-                const resp = await generateDraft(prompt, platform, contentType, linkUrl);
-                if (resp?.success) {
-                    const data = resp.data ?? {}; 
-                    // Fill title/content/image fields
-                    if (data.suggested_content) {
-                        (document.getElementById('postContent') as HTMLTextAreaElement).value = data.suggested_content;
-                        // optional: fill title as first 80 chars
-                        (document.getElementById('postTitle') as HTMLInputElement).value = data.suggested_content.split('\n')[0].slice(0, 80);
-                    }
-
-                    if (data.temp_image_url) {
-                        (document.getElementById('postImageUrl') as HTMLInputElement).value = data.temp_image_url;
-                        (document.getElementById('postImagePath') as HTMLInputElement).value = data.temp_image_url;
-                    }
-
-                } else {
-                    alert('No se pudo generar el borrador: ' + (resp?.message || 'error'));
+                // Instagram does not accept text-only posts
+                if (platform === "instagram" && contentType === "text") {
+                    return alert(
+                        "Instagram requiere una imagen o video; no es posible generar solo texto para Instagram",
+                    );
                 }
-            } catch (error) {
-                console.error('Error generating draft:', error);
-                alert('Error al generar borrador');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = original;
-            }
-        });
+                if (!prompt) return alert("Escribe un prompt para generar");
+
+                const btn = document.getElementById(
+                    "btnGenerateAI",
+                ) as HTMLButtonElement;
+                btn.disabled = true;
+                const original = btn.textContent;
+                btn.textContent = "Generando...";
+
+                try {
+                    const linkInput = document.getElementById(
+                        "postLinkUrl",
+                    ) as HTMLInputElement;
+                    const linkUrl = linkInput?.value || undefined;
+                    const resp = await generateDraft(
+                        prompt,
+                        platform,
+                        contentType,
+                        linkUrl,
+                    );
+                    if (resp?.success) {
+                        const data = resp.data ?? {};
+                        // Fill title/content/image fields
+                        if (data.suggested_content) {
+                            (
+                                document.getElementById(
+                                    "postContent",
+                                ) as HTMLTextAreaElement
+                            ).value = data.suggested_content;
+                            // optional: fill title as first 80 chars
+                            (
+                                document.getElementById(
+                                    "postTitle",
+                                ) as HTMLInputElement
+                            ).value = data.suggested_content
+                                .split("\n")[0]
+                                .slice(0, 80);
+                        }
+
+                        if (data.temp_image_url) {
+                            (
+                                document.getElementById(
+                                    "postImageUrl",
+                                ) as HTMLInputElement
+                            ).value = data.temp_image_url;
+                            (
+                                document.getElementById(
+                                    "postImagePath",
+                                ) as HTMLInputElement
+                            ).value = data.temp_image_url;
+                        }
+                    } else {
+                        alert(
+                            "No se pudo generar el borrador: " +
+                                (resp?.message || "error"),
+                        );
+                    }
+                } catch (error) {
+                    console.error("Error generating draft:", error);
+                    alert("Error al generar borrador");
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = original;
+                }
+            });
 
         // Cerrar modales
         [
@@ -1410,11 +1484,12 @@ const mockTitle = "Detalle de Campaña";
                                     "postImagePath",
                                 ) as HTMLInputElement
                             ).value,
-                            image_url: (
-                                document.getElementById(
-                                    'postImageUrl',
-                                ) as HTMLInputElement
-                            ).value || null,
+                            image_url:
+                                (
+                                    document.getElementById(
+                                        "postImageUrl",
+                                    ) as HTMLInputElement
+                                ).value || null,
                             link_url: (
                                 document.getElementById(
                                     "postLinkUrl",
